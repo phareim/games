@@ -30,7 +30,7 @@ xxxxxxxxxxxxxxxx....xxxxxxxxxxxxxxxxxxxx
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
-map 0 0 music=cave base=cave
+map 0 0 music=cave base=cave light=dark fx=dust
 door 16 27 id=inn to=landsby at=grotte dir=up w=4
 sign 18 25 text="Grotta under Vestmarka.|Det drypper. Noen har vært her før deg."
 chest 9 4 id=kiste_grotte_v text="En rusten lykt uten olje."

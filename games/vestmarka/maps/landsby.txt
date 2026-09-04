@@ -42,7 +42,7 @@
 ############################################################
 
 // --- objects: type x y key=value ... (text pages split on |)
-map 0 0 music=village base=grass
+map 0 0 music=village base=grass light=cycle fx=fireflies ambient=river
 door 59 20 id=ost to=skog at=vest dir=left h=2
 door 32 33 id=grotte to=grotte at=inn dir=down
 prop 32 32 kind=cave_mouth

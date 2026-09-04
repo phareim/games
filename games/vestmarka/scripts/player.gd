@@ -16,6 +16,27 @@ var frozen := false   # set by World while traveling
 @onready var interact_area: Area2D = $InteractArea
 @onready var hint: Sprite2D = $Hint
 
+var lantern: PointLight2D
+var _shake_tween: Tween
+
+
+func _ready() -> void:
+	lantern = Lights.make(Color(1.0, 0.9, 0.7), 70.0, 1.2, true)
+	lantern.position = Vector2(0, -8)
+	lantern.enabled = false
+	add_child(lantern)
+
+
+func shake(intensity := 2.0, time := 0.25) -> void:
+	if _shake_tween:
+		_shake_tween.kill()
+	_shake_tween = create_tween()
+	var steps := 5
+	for i in steps:
+		var k := 1.0 - float(i) / steps
+		_shake_tween.tween_property(camera, "offset", Vector2(randf_range(-1, 1), randf_range(-1, 1)) * intensity * k, time / steps)
+	_shake_tween.tween_property(camera, "offset", Vector2.ZERO, time / steps)
+
 
 func _physics_process(delta: float) -> void:
 	var locked := Dialogue.active or frozen

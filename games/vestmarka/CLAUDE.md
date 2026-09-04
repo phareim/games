@@ -49,11 +49,13 @@ cell's bottom centre; a 2x2 tree therefore occupies its cell and the one above.
 ## Generated resources — do not hand-edit
 
 `tools/gen_resources.py` (Python + Pillow) writes `assets/tiles/tileset.tres` and
-`assets/hero/hero_frames.tres`. Terrain peering bits come from sampling the tile edges/corners
-(green = grass, else the block's terrain); the strips are listed by hand; only the trusted
-subset of each pixel-boy blob block is used (`BLOB_CELLS`) because the diagonal/multi-corner
-tiles sample as duplicates of the plain tile and filled ponds with holes (2026-09-04).
-Cliff bits are hand-listed (`cliff` dict). Re-run after touching the PNGs or the lists.
+`assets/hero/hero_frames.tres`. Every pixel-boy blob block (dirt, water, cave hole, dark dirt)
+has the same layout, so `BLOB_BITS` maps the trusted 20 cells of a block (3x3 outer set, strips,
+single, four inner corners) to peering bits and `blob_tiles(origin, terrain)` emits them; the
+diagonal/multi-corner tiles are left out because they duplicated the plain tile and filled ponds
+with holes (2026-09-04). Water collision polygons are the bbox of non-green pixels (pixel
+sampling, `classify`). Cliff bits are hand-listed (`cliff` dict). Re-run after touching the PNGs
+or the lists.
 Assets themselves come from `bin/import-ninja-assets` (repo root), which extracts exactly
 the files used from the two zips in `~/tmp/godot/`.
 
@@ -84,5 +86,11 @@ resource and was silently dropped the first time.
    `spacing_space=2`), signs, chests, NPCs, `GameState` flags in `user://`, "Funn n/m" HUD.
 3. ✅ Areas: `Teleporter` doors with `Transition` fade, landsby ↔ skog ↔ grotte, houses and a well as
    props, `Music` autoload with crossfade per map. Not yet: house interiors, ambient SFX.
-4. Polish: day/night `CanvasModulate`, `PointLight2D` torches, water ripples, `CPUParticles2D`.
-Later: house interiors, touch controls, enemies, more biomes, swap to a bought tileset (same 16px grid).
+4. ✅ Polish: `DayNight` (CanvasModulate cycle, 6 min/day; `map light=cycle|dark|none`),
+   `PointLight2D` from `Lights.make` (generated radial texture; props declare `light: [color,
+   radius, energy, flicker]`; the hero carries a lantern in `dark` maps), water ripples on inner
+   pond cells, `Ambience` CPUParticles (`map fx=leaves|fireflies|dust`; fireflies only at night;
+   particles need a texture or Compatibility draws them black), ambient loops (`map ambient=wind|river`),
+   camera shake on chests. `?time=0.85` previews night.
+Later: house interiors, touch controls, enemies, more biomes, swap to a bought tileset (same 16px grid),
+LightOccluder2D on cliffs/walls (skipped for SwiftShader perf and scope).

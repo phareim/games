@@ -8,6 +8,9 @@ const HUD := preload("res://scripts/hud.gd")
 
 var hud: CanvasLayer
 var transition: Transition
+var day_night: DayNight
+var ambience: Ambience
+var glow_layer: CanvasLayer
 var traveling := false
 
 
@@ -17,6 +20,12 @@ func _ready() -> void:
 	add_child(hud)
 	transition = Transition.new()
 	add_child(transition)
+	day_night = DayNight.new()
+	add_child(day_night)
+	glow_layer = CanvasLayer.new()
+	glow_layer.layer = 1
+	glow_layer.follow_viewport_enabled = true
+	add_child(glow_layer)
 	GameState.changed.connect(_check_all_found)
 	_apply_url_params()
 	_enter_map(map.spawn)
@@ -31,6 +40,9 @@ func _apply_url_params() -> void:
 		GameState.reset()
 	if q != "" and FileAccess.file_exists("res://maps/%s.txt" % q):
 		map.map_file = "res://maps/%s.txt" % q
+	var tm: String = str(JavaScriptBridge.eval("new URLSearchParams(location.search).get('time')||''"))
+	if tm != "":
+		day_night.t = clampf(float(tm), 0.0, 0.999)
 
 
 func _enter_map(feet: Vector2) -> void:
@@ -41,7 +53,25 @@ func _enter_map(feet: Vector2) -> void:
 	hud.set_finds(map.find_ids)
 	GameState.current_map = map.map_name()
 	Music.play(map.settings.get("music", ""))
+	Music.ambient(map.settings.get("ambient", ""))
+	day_night.set_mode(map.settings.get("light", "cycle"))
+	player.lantern.enabled = day_night.mode == "dark"
+	if ambience:
+		ambience.queue_free()
+		ambience = null
+	var fx: String = map.settings.get("fx", "")
+	if fx != "":
+		ambience = Ambience.make(fx)
+		glow_layer.add_child(ambience)   # a follow-viewport layer: unaffected by the night tint
 	_check_all_found()
+
+
+func _process(_delta: float) -> void:
+	if ambience:
+		if ambience.kind == "fireflies":
+			ambience.emitting = day_night.is_night()   # glows stay bright
+		else:
+			ambience.modulate = day_night.color         # leaves and dust follow the light
 
 
 ## Called by a Teleporter the player walked into.

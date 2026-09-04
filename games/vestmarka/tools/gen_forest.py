@@ -52,7 +52,7 @@ for y in range(2, H - 2):
 grid[17][4] = "@"   # test spawn (?map=skog); real entry is the west door
 rows = ["".join(r) for r in grid]
 objects = '''
-map 0 0 music=forest base=grass
+map 0 0 music=forest base=grass light=cycle fx=leaves ambient=wind
 door 2 16 id=vest to=landsby at=ost dir=right h=2
 sign 5 15 text="Vestmarka skog.|Stien svinger. Ikke gå fra den om du vil hjem igjen."
 npc 30 9 who=Hunter name="Jegeren" text="Sjø. Stille her, ikke sant?|Jeg så noe blinke lengst nordøst, bak de store trærne. Kan hende det bare var sola."

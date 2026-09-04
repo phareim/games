@@ -102,10 +102,46 @@ func build() -> void:
 	for terrain in by_terrain:
 		if terrain != GROUND:
 			ground.set_cells_terrain_connect(by_terrain[terrain], 0, terrain, false)
+	_add_ripples(by_terrain.get(WATER, []), rng)
 	for line in objects:
 		if not line.begins_with("map "):
 			_add_object(line)
 	print("MapBuilder: %s %dx%d built in %d ms" % [map_file.get_file(), size.x, size.y, Time.get_ticks_msec() - t0])
+
+
+const RIPPLES := preload("res://assets/tiles/water_ripples.png")
+static var _ripple_frames: SpriteFrames
+
+
+## A few animated ripples on inner water cells (all four neighbours water).
+func _add_ripples(water: Array, rng: RandomNumberGenerator) -> void:
+	if water.is_empty():
+		return
+	if _ripple_frames == null:
+		_ripple_frames = SpriteFrames.new()
+		_ripple_frames.add_animation("ripple")
+		_ripple_frames.set_animation_speed("ripple", 5.0)
+		for i in 4:
+			var at := AtlasTexture.new()
+			at.atlas = RIPPLES
+			at.region = Rect2(i * 16, 0, 16, 16)
+			_ripple_frames.add_frame("ripple", at)
+	var set := {}
+	for c in water:
+		set[c] = true
+	for c in water:
+		if rng.randf() > 0.10:
+			continue
+		if not (set.has(c + Vector2i.LEFT) and set.has(c + Vector2i.RIGHT) and set.has(c + Vector2i.UP) and set.has(c + Vector2i.DOWN)):
+			continue
+		var r := AnimatedSprite2D.new()
+		r.sprite_frames = _ripple_frames
+		r.position = Vector2(c) * TILE + Vector2(8, 8)
+		r.modulate.a = 0.8
+		r.play("ripple")
+		r.frame = rng.randi_range(0, 3)
+		r.z_index = -1
+		ground.add_child(r)
 
 
 func _variant(base: Array, rng: RandomNumberGenerator) -> Vector2i:
@@ -166,6 +202,11 @@ func add_prop(kind: String, cell: Vector2i) -> void:
 		shape.position = r.position + r.size / 2.0
 		body.add_child(shape)
 		root.add_child(body)
+	if def.has("light"):
+		var l: Array = def["light"]
+		var light := Lights.make(l[0], l[1], l[2], l.size() > 3 and l[3])
+		light.position = def.get("light_offset", Vector2(0, -6))
+		root.add_child(light)
 	props.add_child(root)
 
 

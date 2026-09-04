@@ -22,11 +22,12 @@ func _ready() -> void:
 	add_child(sprite)
 
 
-func interact(_player: Player) -> void:
+func interact(player: Player) -> void:
 	if GameState.has_flag(id):
 		await Dialogue.say(["Kisten er tom."])
 		return
 	sprite.frame = 1
 	Sfx.play("chest")
+	player.shake(1.5, 0.2)
 	GameState.set_flag(id)
 	await Dialogue.say(pages if not pages.is_empty() else ["Du fant noe."])
