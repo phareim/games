@@ -1,0 +1,38 @@
+#!/usr/bin/env node
+// Load a deployed (or local dist/) game in headless Chromium (SwiftShader WebGL),
+// wait for Godot to boot, save a PNG and print console errors — Claude's eyes.
+// Usage: bin/screenshot <game> [--url https://...] [--wait 6000] [--out path.png] [--click x,y]
+import puppeteer from 'puppeteer-core';
+import { mkdirSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+
+const args = process.argv.slice(2);
+const game = args.find(a => !a.startsWith('--'));
+const opt = (k, d) => { const i = args.indexOf(`--${k}`); return i >= 0 ? args[i + 1] : d; };
+if (!game) { console.error('usage: bin/screenshot <game> [--url U] [--wait ms] [--out file] [--click x,y]'); process.exit(2); }
+const url = opt('url', `https://games.phareim.no/${game}/`);
+const wait = Number(opt('wait', 6000));
+const out = resolve(opt('out', `dist/screens/${game}.png`));
+const click = opt('click', null);
+mkdirSync(dirname(out), { recursive: true });
+
+const browser = await puppeteer.launch({
+  executablePath: process.env.CHROMIUM ?? '/snap/bin/chromium',
+  headless: 'new',
+  args: ['--no-sandbox', '--disable-gpu', '--use-gl=angle', '--use-angle=swiftshader',
+         '--enable-unsafe-swiftshader', '--autoplay-policy=no-user-gesture-required'],
+  defaultViewport: { width: 960, height: 540 },
+});
+const page = await browser.newPage();
+const problems = [];
+page.on('console', m => { if (['error', 'warning'].includes(m.type())) problems.push(`${m.type()}: ${m.text()}`); });
+page.on('pageerror', e => problems.push(`pageerror: ${e.message}`));
+await page.goto(url, { waitUntil: 'networkidle0', timeout: 120_000 });
+// Godot's HTML shell removes #status when the engine has started.
+await page.waitForFunction(() => { const s = document.getElementById('status'); return !s || s.style.visibility === 'hidden' || s.style.display === 'none'; }, { timeout: 120_000 }).catch(() => problems.push('warning: #status never hidden (engine may not have booted)'));
+await new Promise(r => setTimeout(r, wait));
+if (click) { const [x, y] = click.split(',').map(Number); await page.mouse.click(x, y); await new Promise(r => setTimeout(r, 1500)); }
+await page.screenshot({ path: out });
+await browser.close();
+console.log(`saved ${out}`);
+if (problems.length) { console.log('console:'); for (const p of problems.slice(0, 20)) console.log('  ' + p); }

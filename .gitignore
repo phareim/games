@@ -1,3 +1,4 @@
 dist/
 games/*/.godot/
 *.import.tmp
+node_modules/

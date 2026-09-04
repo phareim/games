@@ -43,4 +43,4 @@ served as static files by nginx on Sleeper. Created 2026-09-04.
 3. Smoke-test logic headless: `godot --headless --path games/<name> --quit-after 120`
    (script errors print here; rendering is a dummy).
 4. Add a row in `site/index.html`. Commit, push — the webhook deploys.
-5. Verify in a browser (or `bin/screenshot <name>` if present) at `https://games.phareim.no/<name>/`.
+5. `bin/screenshot <name>` (Puppeteer + snap Chromium with SwiftShader; `--click x,y` to get past the title, `--url` for a local server) writes `dist/screens/<name>.png` and prints console errors. Read the PNG. Snap Chromium can only write inside non-hidden paths under `~`.
