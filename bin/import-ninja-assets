@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# Copy exactly the Ninja Adventure (pixel-boy, CC0) files that games/vestmarka uses
+# from the two zips into games/vestmarka/assets/. Re-runnable; documents provenance.
+# Usage: bin/import-ninja-assets [dir-with-zips]   (default ~/tmp/godot)
+set -euo pipefail
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+SRC=${1:-$HOME/tmp/godot}
+PACK="$SRC/Ninja Adventure - Asset Pack.zip"
+PROJ="$SRC/Godot Project V4.zip"
+DST="$ROOT/games/vestmarka/assets"
+TMP=$(mktemp -d); trap 'rm -rf "$TMP"' EXIT
+
+[ -f "$PACK" ] || { echo "missing $PACK" >&2; exit 1; }
+unzip -qo "$PACK" -d "$TMP"
+unzip -qo "$PROJ" -d "$TMP" 'NinjaAdventure/content/map/*.png'
+P="$TMP/Ninja Adventure - Asset Pack"
+E="$TMP/NinjaAdventure/content/map"
+
+cp_() { mkdir -p "$(dirname "$2")"; cp "$1" "$2"; }
+
+# Tiles: the example project's re-cut floor sheet (grass/dirt blobs) + pack sheets.
+cp_ "$E/tileset_floor.png"            "$DST/tiles/floor.png"
+cp_ "$P/Backgrounds/Tilesets/TilesetWater.png"        "$DST/tiles/water.png"
+cp_ "$P/Backgrounds/Tilesets/TilesetRelief.png"       "$DST/tiles/relief.png"
+cp_ "$P/Backgrounds/Tilesets/TilesetReliefDetail.png" "$DST/tiles/relief_detail.png"
+cp_ "$P/Backgrounds/Tilesets/TilesetNature.png"       "$DST/tiles/nature.png"
+cp_ "$P/Backgrounds/Tilesets/TilesetHouse.png"        "$DST/tiles/house.png"
+cp_ "$P/Backgrounds/Tilesets/TilesetElement.png"      "$DST/tiles/element.png"
+cp_ "$P/Backgrounds/Tilesets/TilesetDungeon.png"      "$DST/tiles/dungeon.png"
+cp_ "$P/Backgrounds/Tilesets/TilesetHole.png"         "$DST/tiles/hole.png"
+cp_ "$P/Backgrounds/Tilesets/TilesetFloorDetail.png"  "$DST/tiles/floor_detail.png"
+cp_ "$P/Backgrounds/Tilesets/Interior/TilesetInterior.png"      "$DST/tiles/interior.png"
+cp_ "$P/Backgrounds/Tilesets/Interior/TilesetInteriorFloor.png" "$DST/tiles/interior_floor.png"
+cp_ "$P/Backgrounds/Tilesets/Interior/TilesetWallSimple.png"    "$DST/tiles/wall_simple.png"
+cp_ "$P/Backgrounds/Animated/Water Ripples/SpriteSheet16x16.png" "$DST/tiles/water_ripples.png"
+
+# Hero: NinjaGreen, 32x32 frames, one sheet per animation (4 directions x 4 frames).
+for a in Idle Walk Roll Push Swim Pickup Item Jump Hit Dead Attack Climb; do
+  cp_ "$P/Actor/CharacterAnimated/NinjaGreen/Separate/$a.png" "$DST/hero/$(echo "$a" | tr 'A-Z' 'a-z').png"
+done
+
+# NPCs: 16x16 villagers (SpriteSheet + Faceset).
+for c in OldMan Villager Villager2 Woman Child Boy Princess Hunter Monk; do
+  cp_ "$P/Actor/Character/$c/SpriteSheet.png" "$DST/npc/$c/sheet.png"
+  cp_ "$P/Actor/Character/$c/Faceset.png"     "$DST/npc/$c/face.png"
+done
+cp_ "$P/Actor/CharacterAnimated/NinjaGreen/Faceset.png" "$DST/hero/face.png" 2>/dev/null || \
+cp_ "$P/Actor/Character/NinjaGreen/Faceset.png" "$DST/hero/face.png"
+
+# UI
+cp_ "$P/Ui/Dialog/DialogBox.png"          "$DST/ui/dialog_box.png"
+cp_ "$P/Ui/Dialog/DialogBoxFaceset.png"   "$DST/ui/dialog_box_faceset.png"
+cp_ "$P/Ui/Dialog/ChoiceBox.png"          "$DST/ui/choice_box.png"
+cp_ "$P/Ui/Font/NormalFont.ttf"           "$DST/ui/normal_font.ttf"
+cp_ "$P/Ui/Theme/Theme Wood/nine_path_panel.png" "$DST/ui/panel.png"
+cp_ "$P/Ui/Arrow.png"                     "$DST/ui/arrow.png"
+for e in 1 2 3 4 5 6 7 8; do cp_ "$P/Ui/Emote/emote$e.png" "$DST/ui/emote$e.png"; done
+
+# Items / props
+cp_ "$P/Items/Treasure/LittleTreasureChest.png" "$DST/ui/chest_small.png"
+cp_ "$P/Items/Treasure/BigTreasureChest.png"    "$DST/ui/chest_big.png"
+cp_ "$P/Items/Treasure/GoldKey.png"             "$DST/ui/key.png"
+cp_ "$P/Items/Treasure/GoldCoin.png"            "$DST/ui/coin.png"
+
+# Audio
+cp_ "$P/Audio/Musics/33 - Calm Village.ogg" "$DST/audio/music/village.ogg"
+cp_ "$P/Audio/Musics/37 - Dark Forest.ogg"  "$DST/audio/music/forest.ogg"
+cp_ "$P/Audio/Musics/2 - The Cave.ogg"      "$DST/audio/music/cave.ogg"
+cp_ "$P/Audio/Sounds/Menu/Accept.wav"       "$DST/audio/sfx/accept.wav"
+cp_ "$P/Audio/Sounds/Ambient/Wind.wav"      "$DST/audio/sfx/wind.wav"
+cp_ "$P/Audio/Sounds/Ambient/River.wav"     "$DST/audio/sfx/river.wav"
+ls "$P/Audio/Sounds/Bonus" | head -3 >/dev/null
+cp_ "$P/Audio/Sounds/Bonus/$(ls "$P/Audio/Sounds/Bonus" | grep -i -m1 chest || ls "$P/Audio/Sounds/Bonus" | head -1)" "$DST/audio/sfx/chest.wav"
+
+cp_ "$P/README.md" "$DST/NINJA-ADVENTURE-README.md"
+echo "imported into $DST"; du -sh "$DST"

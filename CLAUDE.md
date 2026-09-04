@@ -16,6 +16,13 @@ served as static files by nginx on Sleeper. Created 2026-09-04.
   `tufte-viz` skill, 2026-09-04). No framework, no build. **Add an `<li>` per new game** with name,
   date and a one-line note; keep the accent for hover only.
 - `dist/` — build output, gitignored.
+- `bin/import-ninja-assets` — copies the exact Ninja Adventure (CC0) files `vestmarka` uses from the
+  zips in `~/tmp/godot/` (not in git, 126 MB) into `games/vestmarka/assets/`.
+
+## Games
+
+- **pong** — the first export, one scene.
+- **vestmarka** — top-down RPG, maps as text, generated tileset; see `games/vestmarka/CLAUDE.md`.
 
 ## Toolchain (verified 2026-09-04)
 
@@ -46,4 +53,4 @@ served as static files by nginx on Sleeper. Created 2026-09-04.
 3. Smoke-test logic headless: `godot --headless --path games/<name> --quit-after 120`
    (script errors print here; rendering is a dummy).
 4. Add a row in `site/index.html`. Commit, push — the webhook deploys.
-5. `bin/screenshot <name>` (Puppeteer + snap Chromium with SwiftShader; `--click x,y` to get past the title, `--url` for a local server) writes `dist/screens/<name>.png` and prints console errors. Read the PNG. Snap Chromium can only write inside non-hidden paths under `~`. Dependabot alert #1 (extract-zip, no fix) is dismissed as not used — puppeteer-core never downloads a browser here (2026-09-04).
+5. `bin/screenshot <name>` (Puppeteer + snap Chromium with SwiftShader; `--click x,y` to get past the title, `--url` for a local server, `--keys ArrowRight:1500,ArrowUp:800` to hold keys in sequence before the shot; waits for `domcontentloaded` because Godot's shell never reaches `networkidle0` on bigger games, 2026-09-04) writes `dist/screens/<name>.png` and prints console errors. Read the PNG. Snap Chromium can only write inside non-hidden paths under `~`. Dependabot alert #1 (extract-zip, no fix) is dismissed as not used — puppeteer-core never downloads a browser here (2026-09-04).

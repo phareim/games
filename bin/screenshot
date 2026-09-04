@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Load a deployed (or local dist/) game in headless Chromium (SwiftShader WebGL),
 // wait for Godot to boot, save a PNG and print console errors — Claude's eyes.
-// Usage: bin/screenshot <game> [--url https://...] [--wait 6000] [--out path.png] [--click x,y]
+// Usage: bin/screenshot <game> [--url https://...] [--wait 6000] [--out path.png] [--click x,y] [--keys ArrowRight:800,...]
 import puppeteer from 'puppeteer-core';
 import { mkdirSync } from 'node:fs';
 import { resolve, dirname } from 'node:path';
@@ -14,6 +14,7 @@ const url = opt('url', `https://games.phareim.no/${game}/`);
 const wait = Number(opt('wait', 6000));
 const out = resolve(opt('out', `dist/screens/${game}.png`));
 const click = opt('click', null);
+const keys = opt('keys', null);   // e.g. --keys ArrowRight:800,ArrowDown:400 (held sequentially)
 mkdirSync(dirname(out), { recursive: true });
 
 const browser = await puppeteer.launch({
@@ -27,11 +28,20 @@ const page = await browser.newPage();
 const problems = [];
 page.on('console', m => { if (['error', 'warning'].includes(m.type())) problems.push(`${m.type()}: ${m.text()}`); });
 page.on('pageerror', e => problems.push(`pageerror: ${e.message}`));
-await page.goto(url, { waitUntil: 'networkidle0', timeout: 120_000 });
+// 'domcontentloaded' — Godot's shell keeps a connection busy so networkidle0 never fires for larger games (2026-09-04).
+await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 120_000 });
 // Godot's HTML shell removes #status when the engine has started.
 await page.waitForFunction(() => { const s = document.getElementById('status'); return !s || s.style.visibility === 'hidden' || s.style.display === 'none'; }, { timeout: 120_000 }).catch(() => problems.push('warning: #status never hidden (engine may not have booted)'));
 await new Promise(r => setTimeout(r, wait));
 if (click) { const [x, y] = click.split(',').map(Number); await page.mouse.click(x, y); await new Promise(r => setTimeout(r, 1500)); }
+if (keys) {
+  await page.mouse.click(480, 270);   // focus the canvas
+  for (const spec of keys.split(',')) {
+    const [key, ms] = spec.split(':');
+    await page.keyboard.down(key); await new Promise(r => setTimeout(r, Number(ms ?? 500))); await page.keyboard.up(key);
+  }
+  await new Promise(r => setTimeout(r, 700));
+}
 await page.screenshot({ path: out });
 await browser.close();
 console.log(`saved ${out}`);
