@@ -11,17 +11,17 @@
 ##..T........~~~~~~~~~~~~~~~..........:::::::.........T...##
 ##......f....~~~~~~~~~~~~~~~~.......::::...:::........P...##
 ##.T.......h..~~~~~~~~~~~~~~~......::.......:::...T.......##
-##...T.........~~~~~~~~~~~~~......::...B......::.....T....##
-##.....g..........~~~~~~~~........::....b......::....T....##
+##...T.........~~~~~~~~~~~~~......::..........::.....T....##
+##.....g..........~~~~~~~~........::...........::....T....##
 ##.T................~~~~..........::............:::..P....##
 ##...T.......................R....::..............:::.....##
-##......T.......w.............f...::....s.........::...T..##
+##......T.......w.............f...::..............::...T..##
 ##..P......h..........:::::::::::::::..............::.....##
 ##.....T..............:.......::...:...............::.....##
 ##..T.......f.........:.......::...:::.............::.....##
 ##.......T......h.....:.......:......:::..........:::.....##
-##.........@..........:.......:........:::........::...T..##
-##...T................:.......:..........:::::::::::......##
+##.........@..........:.......:........:::........::::::::::
+##...T................:.......:..........:::::::::::::::::::
 ##......P.............:.....g.:......R....:......:........##
 ##..T........B........:.......:...........:.......:.......##
 ##.......T............:::::::::...........:.......:....T..##
@@ -40,3 +40,22 @@
 ##.....P.......P........:...P......P.....P....P....P.....P##
 ############################################################
 ############################################################
+
+// --- objects: type x y key=value ... (text pages split on |)
+map 0 0 music=village base=grass
+door 59 20 id=ost to=skog at=vest dir=left h=2
+door 32 33 id=grotte to=grotte at=inn dir=down
+prop 32 32 kind=cave_mouth
+prop 40 14 kind=house_a
+prop 47 15 kind=house_b
+prop 44 9 kind=well
+sign 13 21 text="Vestmarka.|Stien østover fører til landsbyen, og videre inn i skogen."
+npc 26 18 who=OldMan name="Halvor" text="Velkommen til Vestmarka, fremmede.|Folk sier det ligger gamle ting gjemt rundt i dalen. Kister, mest.|Finn dem alle, så skal jeg fortelle deg om grotta i sør." sets=met_halvor done=alle_funn_landsby text_done="Du fant alt? Da er du klar for grotta.|Inngangen ligger i klippen sør for stien. Ta med lys." face=down
+npc 44 21 who=Villager name="Sigrid" text="Ikke gå i vannet. Det er dypere enn det ser ut." face=left
+npc 12 25 who=Child name="Lille Ola" text="Jeg gjemte noe bak et tre en gang. Men jeg husker ikke hvilket!" face=right
+chest 17 13 id=kiste_dam text="En rusten fiskekrok. Noen har fisket her lenge før deg."
+chest 56 3 id=kiste_skog text="En liten treskål med hakk i kanten. Hjemmelaget."
+chest 6 37 id=kiste_sor text="Et sammenrullet kart. Streken slutter ved en stein."
+chest 44 26 id=kiste_stein text="En glatt, grå stein som er merkelig varm."
+chest 13 3 id=kiste_nord text="En liten messingklokke. Den ringer ikke."
+

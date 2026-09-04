@@ -1,0 +1,37 @@
+// Grotte — 40x30. `x` = void (solid), `d` = dark dirt patches, `.` = cave floor. Entry from the south.
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxx........xxxxxxxxxxxxxx.......xxxxx
+xxxxx...ddd....xxxxxxxxxxxx..dd..c..xxxx
+xxxxx..dddd.....xxxxxxxxxx...ddd.....xxx
+xxxxxx..dd....t....xxxxxx.....d.......xx
+xxxxxxx........c....xxxx..............xx
+xxxxxxxx.........................o....xx
+xxxxxxxxxx.....xxx.........xxx........xx
+xxxxxxxxxxx...xxxxxx.....xxxxxx......xxx
+xxxxxxxxxxx...xxxxxxx...xxxxxxxx....xxxx
+xxxxxxxxxx....xxxxxxx...xxxxxxxxxxxxxxxx
+xxxxxxxxx.....xxxxxx.....xxxxxxxxxxxxxxx
+xxxxxxxx...dd.xxxxxx..d..xxxxxxxxxxxxxxx
+xxxxxxxx..ddd.xxxxx..ddd..xxxxxxxxxxxxxx
+xxxxxxxx...d..xxxxx...d...xxxxxxxxxxxxxx
+xxxxxxxxx....xxxxxxx.....xxxxxxxxxxxxxxx
+xxxxxxxxxx...xxxxxxxx...xxxxxxxxxxxxxxxx
+xxxxxxxxxxx.......xxxx...xxxxxxxxxxxxxxx
+xxxxxxxxxxxx.......xxx....xxxxxxxxxxxxxx
+xxxxxxxxxxxxx..t.......q..xxxxxxxxxxxxxx
+xxxxxxxxxxxxxx........xxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxx......xxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxx....xxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxx....xxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxx.q..xxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxx.@..xxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxx....xxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+map 0 0 music=cave base=cave
+door 16 27 id=inn to=landsby at=grotte dir=up w=4
+sign 18 25 text="Grotta under Vestmarka.|Det drypper. Noen har vært her før deg."
+chest 9 4 id=kiste_grotte_v text="En rusten lykt uten olje."
+chest 33 3 id=kiste_grotte_o big=1 text="En tung nøkkel av messing.|Den passer ingen dør du har sett ennå."

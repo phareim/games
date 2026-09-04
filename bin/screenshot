@@ -37,8 +37,11 @@ if (click) { const [x, y] = click.split(',').map(Number); await page.mouse.click
 if (keys) {
   await page.mouse.click(480, 270);   // focus the canvas
   for (const spec of keys.split(',')) {
-    const [key, ms] = spec.split(':');
-    await page.keyboard.down(key); await new Promise(r => setTimeout(r, Number(ms ?? 500))); await page.keyboard.up(key);
+    const [combo, ms] = spec.split(':');
+    const ks = combo.split('+');                       // "Shift+ArrowRight:3000" holds both
+    for (const k of ks) await page.keyboard.down(k);
+    await new Promise(r => setTimeout(r, Number(ms ?? 500)));
+    for (const k of ks.reverse()) await page.keyboard.up(k);
   }
   await new Promise(r => setTimeout(r, 700));
 }

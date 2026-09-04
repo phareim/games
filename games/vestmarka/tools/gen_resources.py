@@ -14,13 +14,14 @@ ROOT = os.path.dirname(HERE)
 T = 16
 
 # terrain ids in terrain set 0
-GRASS, DIRT, WATER, CLIFF = 0, 1, 2, 3
-TERRAIN_NAMES = ["grass", "dirt", "water", "cliff"]
-TERRAIN_COLORS = ["Color(0.4,0.7,0.2,1)", "Color(0.7,0.45,0.3,1)", "Color(0.3,0.6,0.9,1)", "Color(0.6,0.6,0.55,1)"]
+GRASS, DIRT, WATER, CLIFF, HOLE, DARK = 0, 1, 2, 3, 4, 5
+TERRAIN_NAMES = ["ground", "dirt", "water", "cliff", "hole", "dark"]
+TERRAIN_COLORS = ["Color(0.4,0.7,0.2,1)", "Color(0.7,0.45,0.3,1)", "Color(0.3,0.6,0.9,1)", "Color(0.6,0.6,0.55,1)",
+                  "Color(0.1,0.1,0.12,1)", "Color(0.35,0.25,0.2,1)"]
 
 # atlas sources: id -> (file, ext id)
 SOURCES = [("floor.png", "floor"), ("water.png", "water"), ("relief.png", "relief"),
-           ("nature.png", "nature"), ("house.png", "house")]
+           ("nature.png", "nature"), ("house.png", "house"), ("hole.png", "hole")]
 
 SIDES = {  # name -> pixel window (x0,y0,x1,y1) inclusive, inside a 16x16 tile
     "top_side": (5, 0, 10, 1), "bottom_side": (5, 14, 10, 15),
@@ -70,21 +71,40 @@ def bits_from_ascii(rows, fg):
             "bottom_left_corner": t(rows[2][0]), "bottom_side": t(rows[2][1]), "bottom_right_corner": t(rows[2][2])}
 
 
-# Strips are drawn with uneven margins, so edge sampling misreads them; list them by hand.
-# Keyed by (block origin) relative coords; same layout in the dirt and water blocks.
-STRIP_OVERRIDES = {
+
+
+# The pixel-boy blob block layout (relative to the block origin) and the peering bits of the
+# part we trust: the 3x3 outer set, the two strips, the single, and the four single-inner-corner
+# tiles. The remaining tiles (diagonals, multi-corner combos) duplicated the plain tile when
+# sampled and filled ponds with "hole" tiles; Godot approximates the missing combos.
+# "." = background (terrain 0), "x" = the block's terrain. Verified against pixel sampling.
+BLOB_BITS = {
+    (0, 0): ("...", ".xx", ".xx"), (1, 0): ("...", "xxx", "xxx"), (2, 0): ("...", "xx.", "xx."),
+    (0, 1): (".xx", ".xx", ".xx"), (1, 1): ("xxx", "xxx", "xxx"), (2, 1): ("xx.", "xx.", "xx."),
+    (0, 2): (".xx", ".xx", "..."), (1, 2): ("xxx", "xxx", "..."), (2, 2): ("xx.", "xx.", "..."),
     (3, 0): ("...", ".x.", ".x."), (3, 1): (".x.", ".x.", ".x."), (3, 2): (".x.", ".x.", "..."),
     (0, 3): ("...", ".xx", "..."), (1, 3): ("...", "xxx", "..."), (2, 3): ("...", "xx.", "..."),
     (3, 3): ("...", ".x.", "..."),
+    (5, 1): ("xxx", "xxx", "xx."), (6, 1): ("xxx", "xxx", ".xx"),
+    (5, 2): ("xx.", "xxx", "xxx"), (6, 2): (".xx", "xxx", "xxx"),
 }
+BLOB_CELLS = list(BLOB_BITS.keys())
 
 
-# The trusted part of a pixel-boy blob block (relative to the block origin): the 3x3 outer
-# set, the two strips, the single, and the four single-inner-corner tiles. The remaining
-# tiles (diagonals, multi-corner combos) sample ambiguously and duplicate the plain tile,
-# which made ponds fill with "hole" tiles; Godot approximates the missing combos.
-BLOB_CELLS = [(x, y) for y in range(3) for x in range(3)] + [(3, 0), (3, 1), (3, 2), (0, 3), (1, 3), (2, 3), (3, 3),
-              (5, 1), (6, 1), (5, 2), (6, 2)]
+def blob_tiles(source_tiles, origin, terrain, skip=(), collide=None, im=None):
+    """Emit one blob block at `origin` (atlas coords of the 3x3's top-left) with terrain bits.
+    collide: None | "full" | "bbox" (bbox of non-background pixels, needs `im`)."""
+    for (rx, ry), rows in BLOB_BITS.items():
+        if (rx, ry) in skip:
+            continue
+        tx, ty = origin[0] + rx, origin[1] + ry
+        poly = None
+        if collide == "full":
+            poly = rect_poly(0, 0, 16, 16)
+        elif collide == "bbox":
+            _, _, bbox = classify(im, tx, ty, terrain)
+            poly = rect_poly(*bbox) if bbox else None
+        source_tiles += tile_lines(tx, ty, terrain, bits_from_ascii(rows, terrain), poly=poly)
 
 
 def rect_poly(x0, y0, x1, y1):
@@ -132,27 +152,21 @@ def gen_tileset(debug):
         tiles[0] += tile_lines(tx, 12, GRASS, allgrass, prob=0.06)
     for tx in (2, 3):
         tiles[0] += tile_lines(tx, 11, GRASS, allgrass, prob=0.04)
-    dirt_cells = [(x, 7 + y) for (x, y) in BLOB_CELLS]
-    for (tx, ty) in dirt_cells:
-        terrain, bits, _ = classify(im, tx, ty, DIRT)
-        if (tx, ty - 7) in STRIP_OVERRIDES:
-            terrain, bits = DIRT, bits_from_ascii(STRIP_OVERRIDES[(tx, ty - 7)], DIRT)
-        tiles[0] += tile_lines(tx, ty, terrain, bits)
-        if debug: print("floor", tx, ty, ascii_bits(bits, terrain))
+    blob_tiles(tiles[0], (0, 7), DIRT)
     # bare dirt decor (X mark, stone) as plain dirt variants
     for tx in (0, 1):
         tiles[0] += tile_lines(tx, 11, DIRT, {n: DIRT for n in SIDES}, prob=0.05)
+    # cave: tan base (ground terrain, other sheet region) + dark-dirt blob
+    tiles[0] += tile_lines(11, 19, GRASS, allgrass, prob=1.0)
+    for tx in (12, 13, 14, 15):
+        tiles[0] += tile_lines(tx, 19, GRASS, allgrass, prob=0.06)
+    blob_tiles(tiles[0], (11, 14), DARK)
 
     # --- water.png (source 1): water-on-grass blob, with collision on the wet part ------
-    im = imgs[1]
-    water_cells = [(x, 6 + y) for (x, y) in BLOB_CELLS if (x, y) != (3, 3)]  # (3,3) is sand there
-    for (tx, ty) in water_cells:
-        terrain, bits, bbox = classify(im, tx, ty, WATER)
-        if (tx, ty - 6) in STRIP_OVERRIDES and (tx, ty - 6) != (3, 3):
-            terrain, bits = WATER, bits_from_ascii(STRIP_OVERRIDES[(tx, ty - 6)], WATER)
-        poly = rect_poly(*bbox) if bbox and terrain == WATER else None
-        tiles[1] += tile_lines(tx, ty, terrain, bits, poly=poly)
-        if debug: print("water", tx, ty, ascii_bits(bits, terrain), bbox)
+    blob_tiles(tiles[1], (0, 6), WATER, skip=[(3, 3)], collide="bbox", im=imgs[1])  # (3,3) is sand there
+
+    # --- hole.png (source 5): the void beyond cave floors, solid ------------------------
+    blob_tiles(tiles[5], (0, 0), HOLE, collide="full")
 
     # --- relief.png (source 2): cliff plateau, sides-only set, hand-listed ------------
     G, C = GRASS, CLIFF
