@@ -1,0 +1,3 @@
+dist/
+games/*/.godot/
+*.import.tmp

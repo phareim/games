@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+# Export every game and publish dist/ + site/ to /var/www/games (games.phareim.no).
+# Run by the sleeper-deploy webhook on push to main, or by hand.
+set -euo pipefail
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+WWW=${WWW:-/var/www/games}
+cd "$ROOT"
+"$ROOT/bin/export"
+mkdir -p "$WWW"
+rsync -a --delete --exclude '.godot' "$ROOT/dist/" "$WWW/"
+rsync -a "$ROOT/site/" "$WWW/"
+echo "deployed to $WWW: $(ls "$WWW" | tr '\n' ' ')"

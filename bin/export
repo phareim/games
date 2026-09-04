@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Export one or more games to dist/<name>/ as a Godot web build (headless).
+# Usage: bin/export [game ...]   — no args = every games/*/project.godot
+set -euo pipefail
+ROOT=$(cd "$(dirname "$0")/.." && pwd)
+GODOT=${GODOT:-$HOME/opt/godot/godot}
+
+if [ $# -gt 0 ]; then games=("$@"); else
+  games=(); for p in "$ROOT"/games/*/project.godot; do games+=("$(basename "$(dirname "$p")")"); done
+fi
+
+for g in "${games[@]}"; do
+  src="$ROOT/games/$g"; out="$ROOT/dist/$g"
+  [ -f "$src/project.godot" ] || { echo "no such game: $g" >&2; exit 1; }
+  rm -rf "$out"; mkdir -p "$out"
+  echo "== $g: import"
+  "$GODOT" --headless --path "$src" --import >/dev/null 2>&1 || true   # first run creates .godot/
+  echo "== $g: export"
+  "$GODOT" --headless --path "$src" --export-release Web "$out/index.html" 2>&1 | grep -v '^$' || true
+  [ -f "$out/index.wasm" ] || { echo "export failed for $g (no index.wasm)" >&2; exit 1; }
+  # Precompress for nginx gzip_static (wasm ~40 MB -> ~9 MB on the wire).
+  find "$out" -type f \( -name '*.wasm' -o -name '*.pck' -o -name '*.js' -o -name '*.html' \) -exec gzip -kf -9 {} \;
+  du -sh "$out" | sed 's/^/   /'
+done
