@@ -11,7 +11,10 @@ served as static files by nginx on Sleeper. Created 2026-09-04.
 - `bin/export [name ...]` — headless import + export to `dist/<name>/` and gzip-precompress
   `.wasm/.pck/.js/.html`. No args = every game. ~15 s per small game on Sleeper.
 - `bin/deploy` — export all, then rsync `dist/` + `site/` to `/var/www/games`.
-- `site/` — the landing page (`index.html`). **Add a row per new game.**
+- `site/` — the landing page (`index.html`) in the **Tufte Viz** look (warm/midnight paper,
+  ET Book from `site/fonts/`, hairline rules, crimson only on hover; tokens copied inline from the
+  `tufte-viz` skill, 2026-09-04). No framework, no build. **Add an `<li>` per new game** with name,
+  date and a one-line note; keep the accent for hover only.
 - `dist/` — build output, gitignored.
 
 ## Toolchain (verified 2026-09-04)

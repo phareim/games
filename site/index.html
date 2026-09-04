@@ -3,30 +3,47 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
 <title>games.phareim.no</title>
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <style>
-  :root { color-scheme: dark; }
-  body { margin: 0; background: #12141a; color: #e8e6df; font: 18px/1.5 system-ui, sans-serif; }
-  main { max-width: 640px; margin: 0 auto; padding: 4rem 1.5rem; }
-  h1 { font-weight: 600; letter-spacing: .02em; margin: 0 0 .25rem; }
-  p.sub { color: #8a8f9c; margin: 0 0 2.5rem; }
-  ul { list-style: none; padding: 0; margin: 0; }
-  li { border-top: 1px solid #2a2e38; padding: 1rem 0; display: flex; justify-content: space-between; gap: 1rem; align-items: baseline; }
-  li:last-child { border-bottom: 1px solid #2a2e38; }
-  a { color: #f2b632; text-decoration: none; font-weight: 600; }
-  a:hover { text-decoration: underline; }
-  small { color: #8a8f9c; }
-  footer { margin-top: 3rem; color: #5c6170; font-size: .85rem; }
+  /* Tufte Viz tokens (warm paper / midnight paper) — see the tufte-viz skill. */
+  @font-face { font-family: "ET Book"; src: url(/fonts/et-book-roman.woff) format("woff"); font-weight: 400; font-style: normal; font-display: swap; }
+  @font-face { font-family: "ET Book"; src: url(/fonts/et-book-italic.woff) format("woff"); font-weight: 400; font-style: italic; font-display: swap; }
+  @font-face { font-family: "ET Book"; src: url(/fonts/et-book-semibold.woff) format("woff"); font-weight: 600; font-style: normal; font-display: swap; }
+  :root {
+    --paper: #fbf9f4; --ink: #111111; --ink-soft: #4a473f; --ink-quiet: #6b675d;
+    --rule: #e7e2d8; --accent: #c1351d; --accent-ink: #9a2a17;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper: #14130f; --ink: #ececec; --ink-soft: #cfcabe; --ink-quiet: #9b968a;
+            --rule: #322f29; --accent: #ff6b4a; --accent-ink: #ff8a6e; }
+  }
+  html { background: var(--paper); }
+  body { margin: 0; color: var(--ink-soft); font-family: "ET Book", Charter, Palatino, Georgia, serif; font-size: 20px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  main { max-width: 38rem; margin: 0 auto; padding: 6rem 1.5rem 4rem; }
+  h1 { font-weight: 400; font-size: 2.2rem; letter-spacing: -.01em; line-height: 1.1; color: var(--ink); margin: 0; }
+  p.lede { color: var(--ink-quiet); font-style: italic; margin: .5rem 0 3rem; }
+  ol { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--rule); }
+  li { border-bottom: 1px solid var(--rule); padding: .9rem 0; display: grid; grid-template-columns: 1fr auto; gap: .25rem 1.5rem; align-items: baseline; }
+  li a { color: var(--ink); text-decoration: none; font-size: 1.25rem; }
+  li a:hover, li a:focus-visible { color: var(--accent-ink); text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: .18em; outline: none; }
+  li small { color: var(--ink-quiet); font-size: .85rem; font-variant-numeric: tabular-nums; text-align: right; }
+  li .note { grid-column: 1 / -1; color: var(--ink-quiet); font-size: .95rem; }
+  @media (max-width: 480px) { body { font-size: 18px; } main { padding-top: 4rem; } li { grid-template-columns: 1fr; } li small { text-align: left; } }
 </style>
 </head>
 <body>
 <main>
   <h1>games.phareim.no</h1>
-  <p class="sub">Små spill og interaktive ting, bygget i Godot og kjørt i nettleseren.</p>
-  <ul>
-    <li><a href="/pong/">Pong</a><small>piltaster eller berøring · først til 7</small></li>
-  </ul>
-  <footer>Godot 4 · web-eksport · servert av nginx på Sleeper</footer>
+  <p class="lede">Små spill og interaktive ting, laget med Godot 4.</p>
+  <ol>
+    <li>
+      <a href="/pong/">Pong</a>
+      <small>2026-09-04</small>
+      <span class="note">Piltaster eller W/S, berøring på mobil. Først til 7 mot maskinen.</span>
+    </li>
+  </ol>
 </main>
 </body>
 </html>

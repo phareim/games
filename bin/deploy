@@ -7,6 +7,6 @@ WWW=${WWW:-/var/www/games}
 cd "$ROOT"
 "$ROOT/bin/export"
 mkdir -p "$WWW"
-rsync -a --delete --exclude '.godot' "$ROOT/dist/" "$WWW/"
+rsync -a --delete --exclude '.godot' --exclude 'screens' "$ROOT/dist/" "$WWW/"
 rsync -a "$ROOT/site/" "$WWW/"
 echo "deployed to $WWW: $(ls "$WWW" | tr '\n' ' ')"
