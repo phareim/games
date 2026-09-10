@@ -3,5 +3,5 @@
   "private": true,
   "description": "Godot web exports for games.phareim.no — see CLAUDE.md",
   "scripts": { "export": "bin/export", "deploy": "bin/deploy", "screenshot": "bin/screenshot" },
-  "devDependencies": { "puppeteer-core": "^24.0.0" }
+  "devDependencies": { "puppeteer-core": "^25.0.0" }
 }
