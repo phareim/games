@@ -4,6 +4,9 @@ extends Node
 const STREAMS := {
 	"accept": preload("res://assets/audio/sfx/accept.wav"),
 	"chest": preload("res://assets/audio/sfx/chest.wav"),
+	"travel": preload("res://assets/audio/sfx/travel.wav"),
+	"talk": preload("res://assets/audio/sfx/talk.wav"),
+	"secret": preload("res://assets/audio/sfx/secret.wav"),
 }
 
 var players: Array[AudioStreamPlayer] = []

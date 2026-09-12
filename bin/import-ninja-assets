@@ -71,6 +71,9 @@ cp_ "$P/Audio/Sounds/Ambient/Wind.wav"      "$DST/audio/sfx/wind.wav"
 cp_ "$P/Audio/Sounds/Ambient/River.wav"     "$DST/audio/sfx/river.wav"
 ls "$P/Audio/Sounds/Bonus" | head -3 >/dev/null
 cp_ "$P/Audio/Sounds/Bonus/$(ls "$P/Audio/Sounds/Bonus" | grep -i -m1 chest || ls "$P/Audio/Sounds/Bonus" | head -1)" "$DST/audio/sfx/chest.wav"
+cp_ "$P/Audio/Sounds/Whoosh & Slash/Whoosh.wav" "$DST/audio/sfx/travel.wav"
+cp_ "$P/Audio/Sounds/Voice/Voice4.wav"         "$DST/audio/sfx/talk.wav"
+cp_ "$P/Audio/Jingles/Secret2.wav"             "$DST/audio/sfx/secret.wav"
 
 cp_ "$P/README.md" "$DST/NINJA-ADVENTURE-README.md"
 echo "imported into $DST"; du -sh "$DST"

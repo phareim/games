@@ -34,6 +34,7 @@ var font: Font
 var snd_paddle: AudioStreamPlayer
 var snd_wall: AudioStreamPlayer
 var snd_score: AudioStreamPlayer
+var snd_win: AudioStreamPlayer
 
 
 func _ready() -> void:
@@ -41,6 +42,7 @@ func _ready() -> void:
 	snd_paddle = _make_tone(660.0, 0.06)
 	snd_wall = _make_tone(330.0, 0.05, 0.25)
 	snd_score = _make_tone(180.0, 0.25, 0.3)
+	snd_win = _make_arpeggio([523.0, 659.0, 784.0, 1047.0], 0.11)
 
 
 func _make_tone(freq: float, dur: float, vol := 0.35) -> AudioStreamPlayer:
@@ -53,6 +55,29 @@ func _make_tone(freq: float, dur: float, vol := 0.35) -> AudioStreamPlayer:
 		var square := 1.0 if fmod(t * freq, 1.0) < 0.5 else -1.0
 		var env := 1.0 - float(i) / n
 		data.encode_s16(i * 2, int(square * env * vol * 32000.0))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = rate
+	wav.data = data
+	var p := AudioStreamPlayer.new()
+	p.stream = wav
+	add_child(p)
+	return p
+
+
+## Win jingle: the given notes in sequence, same square-wave voice as the rest.
+func _make_arpeggio(freqs: Array, note_dur: float, vol := 0.35) -> AudioStreamPlayer:
+	var rate := 22050
+	var data := PackedByteArray()
+	for f in freqs:
+		var n := int(rate * note_dur)
+		var start := data.size()
+		data.resize(start + n * 2)
+		for i in n:
+			var t := float(i) / rate
+			var square := 1.0 if fmod(t * float(f), 1.0) < 0.5 else -1.0
+			var env := 1.0 - float(i) / n
+			data.encode_s16(start + i * 2, int(square * env * vol * 32000.0))
 	var wav := AudioStreamWAV.new()
 	wav.format = AudioStreamWAV.FORMAT_16_BITS
 	wav.mix_rate = rate
@@ -94,6 +119,7 @@ func _serve() -> void:
 	var angle := randf_range(-0.45, 0.45)
 	ball_vel = Vector2(serve_dir, 0).rotated(angle) * SERVE_SPEED
 	state = "play"
+	snd_paddle.play()
 
 
 func _process(dt: float) -> void:
@@ -186,6 +212,7 @@ func _point(who: int) -> void:
 	if score[who] >= WIN_SCORE:
 		state = "over"
 		ball_vel = Vector2.ZERO
+		snd_win.play()
 	else:
 		_serve()
 

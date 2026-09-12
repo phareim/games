@@ -80,6 +80,7 @@ func travel(to_map: String, at_door: String) -> void:
 		return
 	traveling = true
 	player.frozen = true
+	Sfx.play("travel", -8.0)
 	await transition.fade_to(1.0)
 	map.map_file = "res://maps/%s.txt" % to_map
 	var door: Teleporter = map.doors.get(at_door)
@@ -96,5 +97,9 @@ func travel(to_map: String, at_door: String) -> void:
 func _check_all_found() -> void:
 	if map == null or map.find_ids.is_empty():
 		return
+	var key := "alle_funn_" + map.map_name()
+	if GameState.has_flag(key):
+		return
 	if GameState.count_flags(map.find_ids) == map.find_ids.size():
-		GameState.set_flag("alle_funn_" + map.map_name())
+		GameState.set_flag(key)
+		Sfx.play("secret", -6.0)

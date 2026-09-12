@@ -75,6 +75,11 @@ func _ready() -> void:
 
 func say(pages: Array, speaker := "", face_tex: Texture2D = null) -> void:
 	active = true
+	# Opening blip: a voice for people, a paper tick for signs and chests.
+	if face_tex:
+		Sfx.play("talk", -10.0)
+	else:
+		Sfx.play("accept", -12.0)
 	box.texture = box_face if face_tex else box_plain
 	face.visible = face_tex != null
 	face.texture = face_tex
