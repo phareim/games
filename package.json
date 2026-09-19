@@ -1,7 +1,7 @@
 {
   "name": "games",
   "private": true,
-  "description": "Godot web exports for games.phareim.no — see CLAUDE.md",
+  "description": "Godot web exports for games.phareim.no — see AGENTS.md",
   "scripts": { "export": "bin/export", "deploy": "bin/deploy", "screenshot": "bin/screenshot" },
   "devDependencies": { "puppeteer-core": "^25.0.0" }
 }

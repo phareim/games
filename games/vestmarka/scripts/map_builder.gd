@@ -3,7 +3,7 @@
 ##
 ## File format: grid rows first (one char per tile, `//` = comment), a blank line, then
 ## object lines `type x y key=value key="quoted value"`. Types: map (music=, base=grass|cave),
-## sign, chest, npc, door, prop. See CLAUDE.md for the character legend.
+## sign, chest, npc, door, prop. See AGENTS.md for the character legend.
 @tool
 class_name MapBuilder
 extends Node2D
