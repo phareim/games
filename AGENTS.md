@@ -24,8 +24,8 @@ served as static files by nginx on Sleeper. Created 2026-09-04.
   `https://phareim.no/?theme=<id>`. Adventures as two wide features: Neon Shrine (`zelda`),
   Another Shore (`anotherworld`). The arcade as seven cabinets: Galaga, Breakout, R-Type, Space
   Invaders, Star Fox, OutRun, Tetris. A "back room" strip: Hall of Fame (`leaderboard`) and Hangar
-  (`hangar`). Hero and footer link to `https://phareim.no` as "the portal" (phareim.no is becoming
-  a walkable neon town with an arcade hall). Pitches and controls come from
+  (`hangar`). Hero and footer link to `https://phareim.no` as "the portal" (phareim.no opens on a
+  walkable neon town with an arcade hall, since 2026-09-24). Pitches and controls come from
   `~/github/phareim.no/docs/games/*.md` and each game's own title-screen hints; copy is English.
 - **Godot games are deployed but not listed** (Petter's decision, 2026-09-24): `/vestmarka/` and
   `/pong/` still come from `dist/` on every deploy; the page just doesn't link them.
