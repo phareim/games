@@ -1,54 +1,442 @@
 <!doctype html>
-<html lang="no">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light dark">
-<title>games.phareim.no</title>
+<meta name="color-scheme" content="dark">
+<meta name="theme-color" content="#0b0616">
+<title>Phareim Arcade</title>
+<meta name="description" content="Nine synthwave arcade games you play in the browser at phareim.no: two adventures, seven score games and a Hall of Fame.">
+<meta property="og:title" content="Phareim Arcade">
+<meta property="og:description" content="Nine synthwave arcade games in the browser. Keyboard or touch, nothing to install.">
+<meta property="og:image" content="https://games.phareim.no/shots/outrun.webp">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/orbitron-latin-900-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/space-mono-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <style>
-  /* Tufte Viz tokens (warm paper / midnight paper) — see the tufte-viz skill. */
-  @font-face { font-family: "ET Book"; src: url(/fonts/et-book-roman.woff) format("woff"); font-weight: 400; font-style: normal; font-display: swap; }
-  @font-face { font-family: "ET Book"; src: url(/fonts/et-book-italic.woff) format("woff"); font-weight: 400; font-style: italic; font-display: swap; }
-  @font-face { font-family: "ET Book"; src: url(/fonts/et-book-semibold.woff) format("woff"); font-weight: 600; font-style: normal; font-display: swap; }
+  /* Neon Dreams (the games' design system, skill neon-dreams-design): one violet-black ground,
+     three neons with three jobs: cyan = interface, pink = call to action, gold = reward. */
+  @font-face { font-family: "Space Grotesk"; src: url(/fonts/space-grotesk-latin-300-normal.woff2) format("woff2"); font-weight: 300; font-display: swap; }
+  @font-face { font-family: "Space Grotesk"; src: url(/fonts/space-grotesk-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Space Mono"; src: url(/fonts/space-mono-latin-400-normal.woff2) format("woff2"); font-weight: 400; font-display: swap; }
+  @font-face { font-family: "Space Mono"; src: url(/fonts/space-mono-latin-700-normal.woff2) format("woff2"); font-weight: 700; font-display: swap; }
+  @font-face { font-family: "Orbitron"; src: url(/fonts/orbitron-latin-900-normal.woff2) format("woff2"); font-weight: 900; font-display: swap; }
+
   :root {
-    --paper: #fbf9f4; --ink: #111111; --ink-soft: #4a473f; --ink-quiet: #6b675d;
-    --rule: #e7e2d8; --accent: #c1351d; --accent-ink: #9a2a17;
+    --cyan: #2ff3ff; --pink: #ff2fa0; --gold: #ffd23f; --orange: #ff6a3d;
+    --cyan-rgb: 47,243,255; --pink-rgb: 255,47,160; --gold-rgb: 255,210,63;
+    --ground: #0b0616; --ground-deep: #060310; --mountain: #120826;
+    --ink: #f2e9ff; --ink-muted: #b9a8d9; --ink-subtle: #8a7aab;
+    --font-person: "Space Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --font-machine: "Space Mono", ui-monospace, "Courier New", monospace;
+    --font-display: "Orbitron", var(--font-machine);
+    --glow-hud: 0 0 8px rgba(47,243,255,.65), 0 0 24px rgba(255,47,160,.35);
+    --glow-hint: 0 0 10px rgba(255,47,160,.6);
+    --glow-title: 0 0 12px rgba(255,47,160,.8), 0 0 40px rgba(255,47,160,.4);
+    --glow-reward: 0 0 10px rgba(255,210,63,.7), 0 0 28px rgba(255,210,63,.35);
+    --sun: linear-gradient(to bottom, #ffd23f 0%, #ff6a3d 55%, #ff2fa0 100%);
+    --gutter: 16px;
+    --hover: 120ms ease-in-out;
   }
-  @media (prefers-color-scheme: dark) {
-    :root { --paper: #14130f; --ink: #ececec; --ink-soft: #cfcabe; --ink-quiet: #9b968a;
-            --rule: #322f29; --accent: #ff6b4a; --accent-ink: #ff8a6e; }
+  @media (min-width: 720px) { :root { --gutter: 32px; } }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  html { background: var(--ground-deep); -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0; min-height: 100vh; overflow-x: hidden;
+    color: var(--ink);
+    font: 300 16px/1.45 var(--font-person);
+    -webkit-font-smoothing: antialiased;
   }
-  html { background: var(--paper); }
-  body { margin: 0; color: var(--ink-soft); font-family: "ET Book", Charter, Palatino, Georgia, serif; font-size: 20px; line-height: 1.5; -webkit-font-smoothing: antialiased; }
-  main { max-width: 38rem; margin: 0 auto; padding: 6rem 1.5rem 4rem; }
-  h1 { font-weight: 400; font-size: 2.2rem; letter-spacing: -.01em; line-height: 1.1; color: var(--ink); margin: 0; }
-  p.lede { color: var(--ink-quiet); font-style: italic; margin: .5rem 0 3rem; }
-  ol { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--rule); }
-  li { border-bottom: 1px solid var(--rule); padding: .9rem 0; display: grid; grid-template-columns: 1fr auto; gap: .25rem 1.5rem; align-items: baseline; }
-  li a { color: var(--ink); text-decoration: none; font-size: 1.25rem; }
-  li a:hover, li a:focus-visible { color: var(--accent-ink); text-decoration: underline; text-decoration-color: var(--accent); text-underline-offset: .18em; outline: none; }
-  li small { color: var(--ink-quiet); font-size: .85rem; font-variant-numeric: tabular-nums; text-align: right; }
-  li .note { grid-column: 1 / -1; color: var(--ink-quiet); font-size: .95rem; }
-  @media (max-width: 480px) { body { font-size: 18px; } main { padding-top: 4rem; } li { grid-template-columns: 1fr; } li small { text-align: left; } }
+  img { display: block; max-width: 100%; height: auto; }
+  a { color: inherit; }
+  :focus-visible { outline: 2px solid var(--cyan); outline-offset: 2px; }
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* The horizon sits behind every screen; content scrolls over it. */
+  #horizon { position: fixed; inset: 0 0 auto 0; width: 100%; height: 100vh; z-index: -1; display: block; }
+  .wrap { width: 100%; max-width: 1320px; margin: 0 auto; padding-inline: var(--gutter); }
+
+  /* Machine voice */
+  .hud, .hint, .over-title, .keys, .cta, .tag { font-family: var(--font-machine); text-transform: uppercase; }
+  .hud { letter-spacing: .15em; color: var(--cyan); text-shadow: var(--glow-hud); font-size: 11px; }
+  .hint { letter-spacing: .12em; color: var(--pink); text-shadow: var(--glow-hint); font-size: 14.4px; }
+  .over-title { letter-spacing: .1em; color: var(--pink); text-shadow: var(--glow-title); line-height: 1; font-weight: 400; margin: 0; }
+
+  /* ── Top bar (HUD: live top-left, idle top-right) ── */
+  .topbar { display: flex; justify-content: space-between; gap: 16px; padding-top: 18px; }
+  .topbar .idle { color: var(--ink-subtle); text-shadow: none; }
+
+  /* ── Hero: the attract screen ── */
+  .hero { min-height: 100vh; min-height: 100svh; display: flex; flex-direction: column; }
+  .hero-body { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: flex-start; text-align: left; padding: 40px 0 26vh; }
+  .hero .insert { font-size: 14.4px; margin: 0 0 18px; }
+  .wordmark { margin: 0; line-height: .95; font-weight: 900; }
+  .wordmark .name { display: block; font: 400 clamp(13px, 2.2vw, 20px)/1 var(--font-machine); letter-spacing: .6em; margin: 0 0 14px; }
+  .wordmark .big {
+    display: block; font-family: var(--font-display); font-size: clamp(52px, 17.5vw, 172px); letter-spacing: .04em;
+    /* The sun, with its cut bands. Glow is drawn twice: blurred pass beneath, crisp fill on top. */
+    background: repeating-linear-gradient(to bottom, transparent 0 58%, var(--ground) 58% 61%, transparent 61% 67%, var(--ground) 67% 71%, transparent 71% 78%, var(--ground) 78% 83%, transparent 83% 100%), var(--sun);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+    filter: drop-shadow(0 0 14px rgba(255,47,160,.55)) drop-shadow(0 0 42px rgba(255,106,61,.25));
+    padding: 0 .04em;
+  }
+  /* From 600 px the sun sets at 80% of the width; keep the wordmark clear of it. */
+  @media (min-width: 600px) { .wordmark .big { font-size: clamp(52px, 12.5vw, 172px); } }
+  .lede { max-width: 31em; margin: 22px 0 0; font-size: clamp(16px, 1.6vw, 19.2px); color: var(--ink-muted); text-wrap: pretty; }
+  .lede strong { font-weight: 400; color: var(--ink); }
+  .hero-actions { margin-top: 30px; display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+  .hero .scroll { margin: 0 auto 22px; font-size: 11.2px; color: var(--ink-subtle); text-shadow: none; letter-spacing: .15em; text-decoration: none; padding: 12px; }
+  .hero .scroll:hover { color: var(--cyan); }
+
+  /* Buttons: mono, near-square, outline + glow; hover = 12% tint + stronger glow, press = 1px sink */
+  .cta {
+    display: inline-flex; align-items: center; justify-content: center; gap: 10px; min-height: 44px; padding: 12px 20px;
+    border: 1px solid var(--pink); border-radius: 4px; color: var(--pink); text-decoration: none;
+    font-size: 14.4px; letter-spacing: .12em; line-height: 1; white-space: nowrap;
+    text-shadow: 0 0 10px rgba(255,47,160,.6); box-shadow: 0 0 8px rgba(255,47,160,.35);
+    transition: background var(--hover), box-shadow var(--hover);
+  }
+  .cta:hover, .cta:focus-visible { background: rgba(255,47,160,.12); box-shadow: 0 0 16px rgba(255,47,160,.55), inset 0 0 12px rgba(255,47,160,.12); }
+  .cta:active { transform: translateY(1px); }
+  .cta-lg { font-size: 16px; padding: 16px 28px; min-height: 56px; background: rgba(11,6,22,.74); }
+  .blink { animation: blink 1.6s ease-in-out infinite alternate; }
+  @keyframes blink { from { opacity: .55; } to { opacity: 1; } }
+
+  /* ── Sections ── */
+  /* Below the attract screen the horizon stays, dimmed, so text never crosses its lines. */
+  main { background: linear-gradient(to bottom, rgba(6,3,16,0), rgba(6,3,16,.8) 320px); }
+  section { padding: 72px 0 24px; }
+  .section-head { display: grid; gap: 12px; margin-bottom: 32px; }
+  .section-head .over-title { font-size: clamp(30px, 5vw, 51.2px); }
+  .section-head p { margin: 0; max-width: 38em; color: var(--ink-muted); }
+  .rule { height: 1px; background: rgba(255,47,160,.25); border: 0; margin: 0; }
+
+  /* Screens: a dark bezel, the capture, scanlines and a CRT vignette on top */
+  .screen { position: relative; background: var(--ground-deep); border: 1px solid rgba(47,243,255,.28); border-radius: 4px; padding: 10px; box-shadow: 0 0 16px rgba(47,243,255,.12), inset 0 0 24px rgba(47,243,255,.05); }
+  .screen .glass { position: relative; overflow: hidden; border-radius: 6px; background: #000; }
+  .screen img { width: 100%; height: 100%; object-fit: cover; transition: filter var(--hover); }
+  .screen .glass::after {
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(to bottom, rgba(0,0,0,0) 0 2px, rgba(6,3,16,.22) 2px 3px);
+    box-shadow: inset 0 0 60px rgba(6,3,16,.75), inset 0 0 0 1px rgba(242,233,255,.06);
+  }
+
+  /* Blueprint corner ticks, from the spec-sheet references */
+  .ticks { position: relative; }
+  .ticks::before, .ticks::after { content: ""; position: absolute; width: 10px; height: 10px; pointer-events: none; border: 0 solid var(--tick, var(--cyan)); }
+  .ticks::before { top: -1px; left: -1px; border-width: 1px 0 0 1px; }
+  .ticks::after { bottom: -1px; right: -1px; border-width: 0 1px 1px 0; }
+
+  .keys { display: grid; grid-template-columns: auto 1fr; gap: 6px 12px; margin: 0; font-size: 11.2px; letter-spacing: .12em; line-height: 1.5; }
+  .keys dt { color: var(--cyan); opacity: .8; }
+  .keys dd { margin: 0; color: var(--ink-muted); }
+
+  /* Stretched link: the whole cabinet is one link target; focus lights the frame */
+  .stretch::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+  .stretch:focus-visible { outline: none; }
+
+  /* ── Adventures: two wide features ── */
+  .features { display: grid; gap: 40px; }
+  .feature {
+    position: relative; display: grid; gap: 24px; padding: 16px;
+    background: rgba(11,6,22,.9); border: 1px solid rgba(255,47,160,.35); border-radius: 4px;
+    box-shadow: 0 0 24px rgba(47,243,255,.12);
+    transition: border-color var(--hover), box-shadow var(--hover);
+  }
+  .feature .screen .glass { aspect-ratio: 16 / 10; }
+  .feature-body { display: flex; flex-direction: column; gap: 14px; padding: 4px 4px 8px; }
+  .feature h3 { margin: 0; font: 900 clamp(34px, 5vw, 56px)/1 var(--font-display); letter-spacing: .04em; color: var(--ink); text-shadow: var(--glow-title); }
+  .feature .tag { font-size: 12px; letter-spacing: .12em; color: var(--pink); text-shadow: var(--glow-hint); margin: 0; }
+  .feature .kicker { margin: 0; }
+  .feature p.pitch { margin: 0; color: var(--ink-muted); font-size: 17px; text-wrap: pretty; }
+  .feature .meta { font-size: 11.2px; }
+  .feature .cta { align-self: flex-start; margin-top: 6px; }
+  @media (min-width: 960px) {
+    .feature { grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 32px; padding: 20px; align-items: center; }
+    .feature:nth-child(even) { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+    .feature:nth-child(even) .screen { order: 2; }
+    .feature-body { padding: 8px 12px 8px 0; }
+    .feature:nth-child(even) .feature-body { padding: 8px 0 8px 12px; }
+  }
+
+  /* ── The arcade: a row of cabinets ── */
+  /* Cabinets stand in rows; a short last row is centred, like a hall floor. */
+  .hall { --cols: 1; --gap: 24px; display: flex; flex-wrap: wrap; justify-content: center; gap: 28px var(--gap); }
+  .hall > .cab { flex: 0 0 calc((100% - (var(--cols) - 1) * var(--gap)) / var(--cols)); min-width: 0; }
+  @media (min-width: 600px) { .hall { --cols: 2; } }
+  @media (min-width: 980px) { .hall { --cols: 3; } }
+  @media (min-width: 1240px) { .hall { --cols: 4; } }
+
+  .cab {
+    position: relative; display: flex; flex-direction: column;
+    background: linear-gradient(to bottom, #150a2c, var(--ground) 30%, var(--ground-deep));
+    border: 1px solid rgba(255,47,160,.35); border-radius: 4px;
+    box-shadow: 0 0 24px rgba(47,243,255,.1);
+    transition: border-color var(--hover), box-shadow var(--hover);
+  }
+  .cab-marquee {
+    position: relative; padding: 18px 12px 16px; text-align: center; overflow: hidden;
+    border-bottom: 2px solid rgba(255,47,160,.8); border-radius: 3px 3px 0 0;
+    background: radial-gradient(120% 140% at 50% 0%, rgba(255,47,160,.28), rgba(255,47,160,0) 60%), linear-gradient(to bottom, #1d0b36, #0d0620);
+    box-shadow: 0 2px 14px rgba(255,47,160,.35);
+  }
+  .cab-marquee h3 { margin: 0; font: 900 clamp(22px, 2.4vw, 27px)/1.05 var(--font-display); letter-spacing: .06em; color: var(--ink); text-shadow: var(--glow-title); white-space: nowrap; }
+  .cab .screen { margin: 16px 14px 0; }
+  .cab .screen .glass { aspect-ratio: 4 / 3; }
+  .cab-deck { flex: 1; display: flex; flex-direction: column; gap: 12px; margin: 16px 0 0; padding: 16px 16px 18px; border-top: 1px solid rgba(47,243,255,.2); background: rgba(6,3,16,.6); }
+  .cab-deck .tag { margin: 0; font-size: 11.2px; letter-spacing: .12em; color: var(--pink); text-shadow: var(--glow-hint); }
+  .cab-deck p.pitch { margin: 0; color: var(--ink-muted); font-size: 15px; line-height: 1.45; text-wrap: pretty; }
+  .cab-deck .keys { margin-top: auto; padding-top: 4px; font-size: 10.4px; }
+  .cab-deck .cta { align-self: stretch; }
+
+  .feature:hover, .feature:focus-within, .cab:hover, .cab:focus-within { border-color: rgba(255,47,160,.75); box-shadow: 0 0 28px rgba(255,47,160,.28), 0 0 0 1px rgba(255,47,160,.25); }
+  .cab:hover .cab-marquee h3, .cab:focus-within .cab-marquee h3 { text-shadow: 0 0 12px rgba(255,47,160,.95), 0 0 48px rgba(255,47,160,.6); }
+  .feature:hover img, .cab:hover img, .feature:focus-within img, .cab:focus-within img { filter: brightness(1.1) saturate(1.08); }
+  .feature:hover .cta, .cab:hover .cta { background: rgba(255,47,160,.12); box-shadow: 0 0 16px rgba(255,47,160,.55), inset 0 0 12px rgba(255,47,160,.12); }
+  .feature:focus-within, .cab:focus-within { outline: 2px solid var(--cyan); outline-offset: 3px; }
+
+  /* ── Back room: Hall of Fame and Hangar as blueprint panels ── */
+  .backroom { display: grid; gap: 24px; margin-top: 56px; }
+  .backroom-head { margin: 0; }
+  @media (min-width: 900px) { .backroom { grid-template-columns: 1fr 1fr; } .backroom-head { grid-column: 1 / -1; } }
+  .panel {
+    position: relative; display: grid; gap: 12px 20px; padding: 38px 16px 18px; align-content: start;
+    background: rgba(6,3,16,.9); border: 1px solid rgba(47,243,255,.4); border-radius: 4px;
+    box-shadow: 0 0 16px rgba(47,243,255,.12), inset 0 0 24px rgba(47,243,255,.04);
+    transition: border-color var(--hover), box-shadow var(--hover);
+  }
+  .panel .corner { position: absolute; top: 12px; left: 14px; margin: 0; font: 400 11px/1 var(--font-machine); letter-spacing: .15em; text-transform: uppercase; color: var(--cyan); text-shadow: 0 0 8px rgba(47,243,255,.6); }
+  .panel h3 { margin: 0; font: 900 22px/1.1 var(--font-display); letter-spacing: .06em; }
+  .panel.fame h3 { color: var(--gold); text-shadow: var(--glow-reward); }
+  .panel.hangar h3 { color: var(--cyan); text-shadow: var(--glow-hud); }
+  .panel .screen { padding: 6px; }
+  .panel .screen .glass { aspect-ratio: 16 / 9; }
+  .panel p.pitch { margin: 0; color: var(--ink-muted); font-size: 15px; text-wrap: pretty; }
+  .panel .go { font: 400 11.2px/1 var(--font-machine); letter-spacing: .12em; text-transform: uppercase; color: var(--cyan); text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+  .panel:hover, .panel:focus-within { border-color: rgba(47,243,255,.8); box-shadow: 0 0 22px rgba(47,243,255,.28); }
+  .panel:focus-within { outline: 2px solid var(--cyan); outline-offset: 3px; }
+  .panel:hover img { filter: brightness(1.1); }
+  @media (min-width: 600px) {
+    .panel { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); grid-template-rows: auto auto 1fr; }
+    .panel .screen { grid-column: 1; grid-row: 1 / span 3; align-self: start; }
+    .panel h3, .panel p.pitch, .panel .go { grid-column: 2; }
+    .panel .go { align-self: end; }
+  }
+
+  /* ── The portal (footer) ── */
+  .portal { padding-block: 96px 40px; text-align: center; }
+  .portal .over-title { font-size: clamp(30px, 5vw, 51.2px); }
+  .portal p.person { max-width: 34em; margin: 20px auto 28px; color: var(--ink-muted); font-size: 17px; text-wrap: pretty; }
+  .credits { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px; margin: 64px 0 0; padding: 20px 0 28px; border-top: 1px solid rgba(255,47,160,.25); font: 400 10.4px/1.6 var(--font-machine); letter-spacing: .15em; text-transform: uppercase; color: var(--ink-subtle); }
+  .credits a { color: var(--ink-muted); text-decoration: none; }
+  .credits a:hover { color: var(--cyan); }
+
+  @media (max-width: 599px) {
+    .topbar .idle { display: none; }
+    section { padding-top: 56px; }
+    .feature { padding: 12px; }
+    .feature .screen { padding: 6px; }
+    .cab .screen { margin: 14px 12px 0; padding: 6px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .blink { animation: none; }
+    *, *::before, *::after { transition: none !important; }
+    html { scroll-behavior: auto; }
+  }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
 </style>
 </head>
 <body>
+<canvas id="horizon" aria-hidden="true"></canvas>
+
+<header class="hero wrap">
+  <div class="topbar">
+    <span class="hud">Phareim arcade</span>
+    <span class="hud idle">Free play · credit ∞</span>
+  </div>
+  <div class="hero-body">
+    <p class="hint insert blink">Insert coin</p>
+    <h1 class="wordmark">
+      <span class="name hud">Phareim</span>
+      <span class="big">ARCADE</span>
+    </h1>
+    <p class="lede">Nine synthwave games that run in the browser, keyboard or touch, nothing to install. They all live on <strong>phareim.no</strong>, which is turning into a walkable neon town with an arcade hall.</p>
+    <div class="hero-actions">
+      <a class="cta cta-lg" href="https://phareim.no">▶ Enter the portal ◀</a>
+    </div>
+  </div>
+  <a class="hud scroll" href="#adventures">▼ Select game</a>
+</header>
+
 <main>
-  <h1>games.phareim.no</h1>
-  <p class="lede">Små spill og interaktive ting, laget med Godot 4.</p>
-  <ol>
-    <li>
-      <a href="/vestmarka/">Vestmarka</a>
-      <small>2026-09-04</small>
-      <span class="note">Toppned-RPG under bygging: gå rundt og oppdag. Piltaster/WASD, Shift for å løpe.</span>
-    </li>
-    <li>
-      <a href="/pong/">Pong</a>
-      <small>2026-09-04</small>
-      <span class="note">Piltaster eller W/S, berøring på mobil. Først til 7 mot maskinen.</span>
-    </li>
-  </ol>
+  <section id="adventures" class="wrap" aria-labelledby="adventures-title">
+    <div class="section-head">
+      <h2 class="over-title" id="adventures-title">Adventures</h2>
+      <p>Longer games with a story. Progress saves to your pilot profile, so you can stop and come back.</p>
+    </div>
+    <div class="features">
+      <article class="feature">
+        <div class="screen ticks"><div class="glass"><img src="/shots/zelda.webp" width="1280" height="800" alt="Neon Shrine title screen over a pixel-art overworld: the hero, a red octopus and dark trees."></div></div>
+        <div class="feature-body">
+          <p class="hud kicker">A neon coast adventure · 20–30 min</p>
+          <h3>NEON SHRINE</h3>
+          <p class="tag">The sun won't set. Go get it back.</p>
+          <p class="pitch">A Link to the Past–style adventure in 80s neon paint: a scrolling overworld, a shop, a cave and a ten-room dungeon with keys, crystal switches, a miniboss and a two-phase boss.</p>
+          <dl class="keys">
+            <dt>Keys</dt><dd>Arrows move · Space sword / talk · K item · Q swap · P pause</dd>
+            <dt>Touch</dt><dd>Drag to move · A sword / talk · B item</dd>
+          </dl>
+          <a class="cta stretch" href="https://phareim.no/?theme=zelda" aria-label="Play Neon Shrine on phareim.no">▶ Play</a>
+        </div>
+      </article>
+      <article class="feature">
+        <div class="screen ticks"><div class="glass"><img src="/shots/anotherworld.webp" width="1126" height="704" alt="Another Shore: a lone figure on a dark shore, a striped sun setting over the sea and a beast on the rocks."></div></div>
+        <div class="feature-body">
+          <p class="hud kicker">A crossing in five chapters</p>
+          <h3>ANOTHER SHORE</h3>
+          <p class="tag">Your ship went down on the far side of the sun.</p>
+          <p class="pitch">A homage to Another World in flat polygons. Run, climb, swim and fight your way across five chapters, from the pool and its tentacles to the beast and the guards.</p>
+          <dl class="keys">
+            <dt>Keys</dt><dd>← → move · ↑ jump · ↓ crouch · Space kick / fire · Esc pause</dd>
+            <dt>Touch</dt><dd>◀ ▶ move · ▲ jump · ▼ crouch · ◆ kick / fire</dd>
+          </dl>
+          <a class="cta stretch" href="https://phareim.no/?theme=anotherworld" aria-label="Play Another Shore on phareim.no">▶ Play</a>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <section id="arcade" class="wrap" aria-labelledby="arcade-title">
+    <div class="section-head">
+      <h2 class="over-title" id="arcade-title">The arcade</h2>
+      <p>Seven score games. Every run posts to one Hall of Fame, and one pilot and ship follow you from cabinet to cabinet.</p>
+    </div>
+    <div class="hall">
+      <article class="cab">
+        <header class="cab-marquee"><h3>GALAGA</h3></header>
+        <div class="screen ticks"><div class="glass"><img src="/shots/galaga.webp" width="960" height="600" loading="lazy" alt="Galaga in play: the cyan ship firing up into a pink formation."></div></div>
+        <div class="cab-deck">
+          <p class="tag">Kestrel has gone quiet</p>
+          <p class="pitch">A vertical shooter against the Choir, a swarm singing over every channel. Claude rides the second seat; fill SYNC and it takes the guns.</p>
+          <dl class="keys">
+            <dt>Keys</dt><dd>Arrows move · Space fire · Shift sync</dd>
+            <dt>Touch</dt><dd>Drag to fly · Two fingers sync</dd>
+          </dl>
+          <a class="cta stretch" href="https://phareim.no/?theme=galaga" aria-label="Play Galaga on phareim.no">▶ Play</a>
+        </div>
+      </article>
+      <article class="cab">
+        <header class="cab-marquee"><h3>BREAKOUT</h3></header>
+        <div class="screen ticks"><div class="glass"><img src="/shots/breakout.webp" width="960" height="600" loading="lazy" alt="Breakout: rows of pink and gold bricks over a striped sun, the cyan paddle below."></div></div>
+        <div class="cab-deck">
+          <p class="tag">The classic, on the grid</p>
+          <p class="pitch">Pink bricks in three tints, gold armoured rows and powerups. The horizon behind you beats on every hit.</p>
+          <dl class="keys">
+            <dt>Keys</dt><dd>← → move · Space launch</dd>
+            <dt>Touch</dt><dd>Drag to move · Tap to launch</dd>
+          </dl>
+          <a class="cta stretch" href="https://phareim.no/?theme=breakout" aria-label="Play Breakout on phareim.no">▶ Play</a>
+        </div>
+      </article>
+      <article class="cab">
+        <header class="cab-marquee"><h3>R-TYPE</h3></header>
+        <div class="screen ticks"><div class="glass"><img src="/shots/rtype.webp" width="960" height="600" loading="lazy" alt="R-Type: the ship and its Force pod in a neon-vector cave."></div></div>
+        <div class="cab-deck">
+          <p class="tag">Endless neon-vector cave</p>
+          <p class="pitch">A side-scroller in outline. Charge the beam, launch the Force pod and chain kills while the cave walls close in.</p>
+          <dl class="keys">
+            <dt>Keys</dt><dd>Arrows / WASD move · Space fire · Shift Force pod</dd>
+            <dt>Touch</dt><dd>Drag to move · Auto-fire · Double-tap Force pod</dd>
+          </dl>
+          <a class="cta stretch" href="https://phareim.no/?theme=rtype" aria-label="Play R-Type on phareim.no">▶ Play</a>
+        </div>
+      </article>
+      <article class="cab">
+        <header class="cab-marquee"><h3>INVADERS</h3></header>
+        <div class="screen ticks"><div class="glass"><img src="/shots/invaders.webp" width="960" height="600" loading="lazy" alt="Space Invaders: a pink five-row formation above four cyan bunkers and the cannon."></div></div>
+        <div class="cab-deck">
+          <p class="tag">Space Invaders · 1978, faithfully</p>
+          <p class="pitch">The original sprites and a march that quickens as they fall. Eroding bunkers, the mystery UFO, gold Pierce and Blast pickups.</p>
+          <dl class="keys">
+            <dt>Keys</dt><dd>← → / A-D move · Hold Space fire</dd>
+            <dt>Touch</dt><dd>Drag to move · Hold to fire</dd>
+          </dl>
+          <a class="cta stretch" href="https://phareim.no/?theme=invaders" aria-label="Play Space Invaders on phareim.no">▶ Play</a>
+        </div>
+      </article>
+      <article class="cab">
+        <header class="cab-marquee"><h3>STAR FOX</h3></header>
+        <div class="screen ticks"><div class="glass"><img src="/shots/starfox.webp" width="960" height="600" loading="lazy" alt="Star Fox: a low-poly ship flying over a pink grid between wireframe mountains."></div></div>
+        <div class="cab-deck">
+          <p class="tag">On rails, in 3D</p>
+          <p class="pitch">Rings, formations and a barrel roll that shrugs off fire. A wingman hunts beside you, and a Dreadnought waits at the end of every sector.</p>
+          <dl class="keys">
+            <dt>Keys</dt><dd>Arrows · Space fire · Shift roll</dd>
+            <dt>Touch</dt><dd>Drag to steer · Auto-fire · Double-tap roll</dd>
+          </dl>
+          <a class="cta stretch" href="https://phareim.no/?theme=starfox" aria-label="Play Star Fox on phareim.no">▶ Play</a>
+        </div>
+      </article>
+      <article class="cab">
+        <header class="cab-marquee"><h3>OUTRUN</h3></header>
+        <div class="screen ticks"><div class="glass"><img src="/shots/outrun.webp" width="960" height="600" loading="lazy" alt="OutRun: a pink convertible with two passengers on a coast road lined with neon palms, the sun ahead."></div></div>
+        <div class="cab-deck">
+          <p class="tag">Fifteen roads · five endings · one clock</p>
+          <p class="pitch">The 1986 cabinet as a road racer. Every stage ends in a fork; tunnels, traffic and close passes stand between you and the goal.</p>
+          <dl class="keys">
+            <dt>Keys</dt><dd>↑ gas · ↓ brake · ← → steer · M radio</dd>
+            <dt>Touch</dt><dd>Drag to steer · 2nd finger brakes</dd>
+          </dl>
+          <a class="cta stretch" href="https://phareim.no/?theme=outrun" aria-label="Play OutRun on phareim.no">▶ Play</a>
+        </div>
+      </article>
+      <article class="cab">
+        <header class="cab-marquee"><h3>TETRIS</h3></header>
+        <div class="screen ticks"><div class="glass"><img src="/shots/tetris.webp" width="960" height="600" loading="lazy" alt="Tetris: the well with a cyan falling piece and pink stacked blocks, score and next piece beside it."></div></div>
+        <div class="cab-deck">
+          <p class="tag">Endless play</p>
+          <p class="pitch">Cyan piece and ghost, pink stack, gold line clears. Hold, hard drop, and gestures made for a thumb.</p>
+          <dl class="keys">
+            <dt>Keys</dt><dd>← → move · ↑ rotate · Space drop · C hold</dd>
+            <dt>Touch</dt><dd>Drag to move · Tap rotate · Flick ↓ drop</dd>
+          </dl>
+          <a class="cta stretch" href="https://phareim.no/?theme=tetris" aria-label="Play Tetris on phareim.no">▶ Play</a>
+        </div>
+      </article>
+
+    </div>
+    <div class="backroom">
+      <p class="hud backroom-head">Back room · where the scores and ships live</p>
+      <article class="panel fame ticks" style="--tick: var(--gold)">
+        <p class="corner">World ranking</p>
+        <h3>HALL OF FAME</h3>
+        <div class="screen"><div class="glass"><img src="/shots/leaderboard.webp" width="960" height="540" loading="lazy" alt="The Hall of Fame: the Galaga world ranking with gold podium ranks."></div></div>
+        <p class="pitch">The world ranking for all seven score games. Your pilot name is an 80s word and an animal, with a painted portrait.</p>
+        <a class="go stretch" href="https://phareim.no/?theme=leaderboard" aria-label="Open the Hall of Fame on phareim.no">▶ See the scores</a>
+      </article>
+      <article class="panel hangar ticks">
+        <p class="corner">Pilot profile</p>
+        <h3>HANGAR</h3>
+        <div class="screen"><div class="glass"><img src="/shots/hangar.webp" width="960" height="540" loading="lazy" alt="The Hangar: pilot profile with high scores, and the Dart ship in a 3D bay."></div></div>
+        <p class="pitch">Your pilot profile: scores, saves and the ship you fly in every ship game. Score in four games to unlock the Vandal.</p>
+        <a class="go stretch" href="https://phareim.no/?theme=hangar" aria-label="Open the Hangar on phareim.no">▶ Visit the hangar</a>
+      </article>
+    </div>
+  </section>
+
+  <section class="portal wrap" aria-labelledby="portal-title">
+    <h2 class="over-title" id="portal-title">The portal</h2>
+    <p class="person">Every game here runs on phareim.no. Walk in through the front door and find the cabinets in the arcade hall, or swipe between them.</p>
+    <a class="cta cta-lg" href="https://phareim.no">▶ Enter the portal ◀</a>
+    <footer class="credits">
+      <span>games.phareim.no</span>
+      <span>Made by <a href="https://phareim.no/?theme=playerone">Petter Hareim</a></span>
+      <span>Keyboard · touch · no install</span>
+    </footer>
+  </section>
 </main>
+
+<script type="module" src="/js/backdrop.js"></script>
 </body>
 </html>
