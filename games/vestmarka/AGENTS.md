@@ -79,18 +79,21 @@ bin/screenshot vestmarka --url http://localhost:8765/vestmarka/ --keys ArrowRigh
 Export must include `maps/*.txt` (`include_filter` in `export_presets.cfg`) — plain text is not a
 resource and was silently dropped the first time.
 
-## Roadmap (plan of 2026-09-04)
+## World systems
 
-1. ✅ Walk around: map from text, autotiles, props, hero, camera, collisions.
-2. ✅ Discover: interactables, dialog box (pack UI + font at its native 9px via `FontVariation`,
-   `spacing_space=2`), signs, chests, NPCs, `GameState` flags in `user://`, "Funn n/m" HUD.
-3. ✅ Areas: `Teleporter` doors with `Transition` fade, landsby ↔ skog ↔ grotte, houses and a well as
-   props, `Music` autoload with crossfade per map. Not yet: house interiors, ambient SFX.
-4. ✅ Polish: `DayNight` (CanvasModulate cycle, 6 min/day; `map light=cycle|dark|none`),
-   `PointLight2D` from `Lights.make` (generated radial texture; props declare `light: [color,
-   radius, energy, flicker]`; the hero carries a lantern in `dark` maps), water ripples on inner
-   pond cells, `Ambience` CPUParticles (`map fx=leaves|fireflies|dust`; fireflies only at night;
-   particles need a texture or Compatibility draws them black), ambient loops (`map ambient=wind|river`),
-   camera shake on chests. `?time=0.85` previews night.
-Later: house interiors, touch controls, enemies, more biomes, swap to a bought tileset (same 16px grid),
-LightOccluder2D on cliffs/walls (skipped for SwiftShader perf and scope).
+- Areas: `Teleporter` doors with a `Transition` fade link landsby, skog and grotte. `Music`
+  autoload crossfades per map; `Sfx` (`scripts/sfx.gd`) plays one-shots by name (accept, chest,
+  travel, talk, secret).
+- Dialog box: pack UI and font at its native 9px via `FontVariation` (`spacing_space=2`).
+  `GameState` flags live in `user://`; the HUD shows "Funn n/m".
+- `DayNight`: CanvasModulate cycle, 6 min per day; `map light=cycle|dark|none`. `?time=0.85`
+  previews night.
+- `PointLight2D` from `Lights.make` (generated radial texture). Props declare `light: [color,
+  radius, energy, flicker]`; the hero carries a lantern in `dark` maps.
+- `Ambience` CPUParticles: `map fx=leaves|fireflies|dust` (fireflies only at night). Particles need
+  a texture, or Compatibility draws them black. Ambient loops: `map ambient=wind|river`.
+- Water ripples on inner pond cells; camera shake on chests.
+
+Not built yet (2026-09-24): house interiors, touch controls, enemies, more biomes, a bought tileset
+on the same 16px grid, LightOccluder2D on cliffs and walls (skipped for SwiftShader performance and
+scope).
